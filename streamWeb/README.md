@@ -1,3 +1,21 @@
+# openCV_Streamer
+
+openCV_Streamer - streamWeb
+
+---
+
+# How to Comfile
+
+```
+g++ -o combineServer.exe combineServer.cpp -std=c++0x  -lpthread `pkg-config opencv --cflags --libs`
+```
+
+
+---
+
+# Source
+
+```
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
@@ -233,3 +251,7 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+
+```
+
+---

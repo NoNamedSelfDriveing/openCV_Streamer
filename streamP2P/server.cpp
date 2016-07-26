@@ -15,14 +15,18 @@ int main(int argc, const char * argv[])
 {
     int sock;
     struct sockaddr_in addr;
+
     double weight = 800;
     double height = 600;
+
     char windowName[] = "Server Camera";
     Mat image = Mat(weight, height, CV_8UC3);
+
     int receiveSize = 65*1024;
-    char buff[receiveSize];   
+    char buff[receiveSize];
     int c;
     int received;
+
     vector<uchar> ibuff;
 
     sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -52,14 +56,18 @@ int main(int argc, const char * argv[])
             }
 
             image = imdecode( Mat(ibuff), CV_LOAD_IMAGE_COLOR);
+
             imshow("test", image);
+
             GaussianBlur(image, image, Size(7,7), 1.5, 1.5);
             cvtColor(image, image, COLOR_BGR2GRAY);
             Canny(image, image, 0, 30, 3);
+
             imshow(windowName, image);
+
             ibuff.clear();
         }
-        
+
         else
         {
             perror("sock");

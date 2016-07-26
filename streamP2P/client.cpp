@@ -5,68 +5,66 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-#include<opencv2/opencv.hpp>
-#include<opencv2/highgui/highgui.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace std;
 using namespace cv;
 
 int main()
 {
-    int sock;
-    int send_len;
-    int c;
-    struct sockaddr_in addr;
-    double weight = 800;
-    double height = 600;
-    VideoCapture capture = 0;
-    Mat frame;
-    vector<uchar> ibuff;
-    vector<int> param = vector<int>(2);
-    char windowName[] = "Client Camera";
-    int sendSize = 65535;
-    char buff[sendSize];
+        int sock;
+        int send_len;
+        int c;
 
-    sock = socket(AF_INET, SOCK_DGRAM, 0);
+        struct sockaddr_in addr;
+        double weight = 800;
+        double height = 600;
 
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(9000);
-    addr.sin_addr.s_addr = inet_addr("10.156.145.32");
+        VideoCapture capture(0);
+        Mat frame;
+        vector<uchar> ibuff;
+        vector<int> param = vector<int>(2);
 
-    if(!capture.isOpened()){
-        exit(1);
-    }
-    //cvNamedWindow (windowName, CV_WINDOW_AUTOSIZE);
+        char windowName[] = "Client Camera";
+        int sendSize = 65535;
+        char buff[sendSize];
 
-    //jpeg compression
+        sock = socket(AF_INET, SOCK_DGRAM, 0);
 
-    capture >> frame;
-    //I fixed It.
-    param[0] = CV_IMWRITE_JPEG_QUALITY;
-    param[1] = 55; //default(95) 0-100
+        addr.sin_family = AF_INET;
+        addr.sin_port = htons(9000);
+        addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    imencode(".jpg", frame, ibuff, param);
-    //cout<<"coded file size(jpg)"<<ibuff.size()<<endl;
-
-    while (1) {
-        capture >> frame;
-        
-        imencode(".jpg", frame, ibuff, param);
-        for (int i = 0; i < ibuff.size(); i++)
-        {
-            buff[i]=ibuff[i];
+        if(!capture.isOpened()) {
+                exit(1);
         }
 
-        send_len = sendto(sock, buff, ibuff.size(), 0, (struct sockaddr *)&addr, sizeof(addr));
 
-        if (send_len==-1)
-            perror("socket");
-        
-        if( waitKey(1) > 0)
-            break;
-    }
+        //I fixed It.
+        param[0] = CV_IMWRITE_JPEG_QUALITY;
+        param[1] = 55; //default(95) 0-100
 
-    cvDestroyWindow(windowName);
-    close(sock);
-    return 0;
+        while (1) {
+                capture >> frame;
+
+                imencode(".jpg", frame, ibuff, param);
+
+                for (int i = 0; i < ibuff.size(); i++)
+                {
+                        buff[i]=ibuff[i];
+                }
+
+                send_len = sendto(sock, buff, ibuff.size(), 0, (struct sockaddr *)&addr, sizeof(addr));
+
+                if (send_len==-1)
+                        perror("socket");
+
+                if( waitKey(1) > 0)
+                        break;
+        }
+
+        cvDestroyWindow(windowName);
+        close(sock);
+        return 0;
 }
